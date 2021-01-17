@@ -1,3 +1,3 @@
-module github.com/ZalgoNoise/zscript/go/sysProbe
+module github.com/ZalgoNoise/sysProbe
 
 go 1.15
