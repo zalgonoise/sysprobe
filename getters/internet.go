@@ -1,10 +1,10 @@
-package internet
+package getters
 
 import (
 	"strconv"
 
-	t "github.com/ZalgoNoise/sysprobe/types"
-	u "github.com/ZalgoNoise/sysprobe/utils"
+	"github.com/ZalgoNoise/sysprobe/types"
+	"github.com/ZalgoNoise/sysprobe/utils"
 )
 
 const ipDevice string = "wlan0"
@@ -12,21 +12,21 @@ const ipDevice string = "wlan0"
 // GetIP function - runs a simple `ip` command to retrieve the
 // current information from the active network device, which
 // returns a pointer to the Internet struct with this data
-func GetIP() *t.Internet {
-	i := &t.Internet{}
+func GetIP() *types.Internet {
+	i := &types.Internet{}
 
-	ip, err := u.Run("ip", "-f", "inet", "addr", "show", ipDevice)
-	u.Check(err)
+	ip, err := utils.Run("ip", "-f", "inet", "addr", "show", ipDevice)
+	utils.Check(err)
 
-	i.Device = u.Splitter(string(ip), ": ", 1)
+	i.Device = utils.Splitter(string(ip), ": ", 1)
 
-	devIndex, err := strconv.Atoi(u.Splitter(string(ip), ": ", 0))
-	u.Check(err)
+	devIndex, err := strconv.Atoi(utils.Splitter(string(ip), ": ", 0))
+	utils.Check(err)
 	i.ID = devIndex
 
-	i.IPAddress = u.Splitter(u.Splitter(u.Splitter(string(ip), "\n", 1), " ", 5), "/", 0)
+	i.IPAddress = utils.Splitter(utils.Splitter(utils.Splitter(string(ip), "\n", 1), " ", 5), "/", 0)
 
-	i.SubnetMask = u.Splitter(u.Splitter(string(ip), "\n", 1), " ", 7)
+	i.SubnetMask = utils.Splitter(utils.Splitter(string(ip), "\n", 1), " ", 7)
 
 	return i
 

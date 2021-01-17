@@ -4,18 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 
-	g "github.com/ZalgoNoise/sysprobe/getters"
-	u "github.com/ZalgoNoise/sysprobe/utils"
+	"github.com/ZalgoNoise/sysprobe/getters"
+	"github.com/ZalgoNoise/sysprobe/utils"
 )
 
 func main() {
-	b := g.GetBattery()
-	i := g.GetIP()
+	b := getters.GetBattery()
+	i := getters.GetIP()
 
-	m := g.MakeMsg(i, b)
+	m := getters.MakeMsg(i, b)
 
 	json, err := json.Marshal(m)
-	u.Check(err)
+	utils.Check(err)
 	fmt.Println(string(json))
 
 }
