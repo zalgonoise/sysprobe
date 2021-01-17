@@ -1,4 +1,4 @@
-package getters
+package internet
 
 import (
 	"strconv"

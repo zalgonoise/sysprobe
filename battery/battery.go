@@ -1,4 +1,4 @@
-package getters
+package battery
 
 import (
 	"bufio"
