@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 
 	"github.com/ZalgoNoise/sysprobe/battery"
@@ -11,8 +12,13 @@ import (
 )
 
 func main() {
-	b := battery.GetBattery()
-	i := internet.GetIP()
+
+	BatteryLoc := flag.String("bat", "battery", "the default location for the battery uevent file, in /sys/class/power_supply/")
+	IPDevice := flag.String("net", "wlan0", "the default network device to retrieve IP-related information, with the `ip` command")
+	flag.Parse()
+
+	b := battery.GetBattery(*BatteryLoc)
+	i := internet.GetIP(*IPDevice)
 
 	m := message.MakeMsg(i, b)
 

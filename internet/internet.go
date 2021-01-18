@@ -7,12 +7,10 @@ import (
 	"github.com/ZalgoNoise/sysprobe/utils"
 )
 
-const ipDevice string = "wlan0"
-
 // GetIP function - runs a simple `ip` command to retrieve the
 // current information from the active network device, which
 // returns a pointer to the Internet struct with this data
-func GetIP() *types.Internet {
+func GetIP(ipDevice string) *types.Internet {
 	i := &types.Internet{}
 
 	ip, err := utils.Run("ip", "-f", "inet", "addr", "show", ipDevice)

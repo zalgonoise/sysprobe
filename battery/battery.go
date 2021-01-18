@@ -10,17 +10,14 @@ import (
 	"github.com/ZalgoNoise/sysprobe/utils"
 )
 
-// customizable folder variable according to your OS
-const powerFolder string = "battery"
-
 // GetBattery function - collects battery related values
 // from /sys/class/power_supply/*/uevent, and returns a
 // pointer to the Battery struct with this data
-func GetBattery() *types.Battery {
+func GetBattery(batteryLoc string) *types.Battery {
 
 	b := &types.Battery{}
 
-	batteryFile := "/sys/class/power_supply/" + powerFolder + "/uevent"
+	batteryFile := "/sys/class/power_supply/" + batteryLoc + "/uevent"
 
 	bat, err := os.Open(batteryFile)
 	utils.Check(err)
