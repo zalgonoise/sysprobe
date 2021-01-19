@@ -5,16 +5,16 @@ import (
 	"time"
 
 	bat "github.com/ZalgoNoise/sysprobe/battery"
-	net "github.com/ZalgoNoise/sysprobe/internet"
+	net "github.com/ZalgoNoise/sysprobe/network"
 	"github.com/ZalgoNoise/sysprobe/utils"
 )
 
 // Message type will contain all structs
 // and a timestamp for when the messsage was sent
 type Message struct {
-	Internet  net.Internet `json:"net"`
-	Battery   bat.Battery  `json:"power"`
-	Timestamp int32        `json:"timestamp"`
+	Network   net.Network `json:"net"`
+	Battery   bat.Battery `json:"power"`
+	Timestamp int32       `json:"timestamp"`
 }
 
 // New function - it builds a new Message struct,
@@ -23,13 +23,13 @@ type Message struct {
 func (m *Message) New(batRef, netRef string) *Message {
 
 	b := &bat.Battery{}
-	i := &net.Internet{}
+	i := &net.Network{}
 
 	b = b.Get(batRef)
 	i = i.Get(netRef)
 
 	m.Battery = *b
-	m.Internet = *i
+	m.Network = *i
 	m.Timestamp = int32(time.Now().Unix())
 
 	return m
