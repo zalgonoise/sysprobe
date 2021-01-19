@@ -20,16 +20,21 @@ type Message struct {
 // New function - it builds a new Message struct,
 // containing the data in Internet, Battery, as well
 // as the current Unix timestamp
-func (m *Message) New(batRef, netRef string) *Message {
+func (m *Message) New(batRef, netRef, pingRef string) *Message {
 
 	b := &bat.Battery{}
-	i := &net.Network{}
+	s := &net.System{}
+	p := &net.PingScan{}
 
 	b = b.Get(batRef)
-	i = i.Get(netRef)
-
 	m.Battery = *b
-	m.Network = *i
+
+	s.Get(netRef)
+	p.Burst(pingRef)
+
+	n := &net.Network{System: *s, Ping: *p}
+	m.Network = *n
+
 	m.Timestamp = int32(time.Now().Unix())
 
 	return m

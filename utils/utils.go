@@ -45,3 +45,12 @@ func Run(args ...string) ([]byte, error) {
 	return outb.Bytes(), nil
 
 }
+
+// TrimSuffix function will remove the last part of a string,
+// taking the string and suffix as input
+func TrimSuffix(s, suffix string) string {
+	if strings.HasSuffix(s, suffix) {
+		s = s[:len(s)-len(suffix)]
+	}
+	return s
+}
