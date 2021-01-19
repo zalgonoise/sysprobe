@@ -23,22 +23,10 @@ type Message struct {
 func (m *Message) New(batRef, netRef, pingRef string, slowPing bool) *Message {
 
 	b := &bat.Battery{}
-	s := &net.System{}
-	p := &net.PingScan{}
-
 	b = b.Get(batRef)
 	m.Battery = *b
 
-	s.Get(netRef)
-
-	if slowPing != true {
-		p.Burst(pingRef)
-	} else {
-		p.Paced(pingRef)
-	}
-
-	n := &net.Network{System: *s, Ping: *p}
-	m.Network = *n
+	m.Network = *m.Network.Build(netRef, pingRef, slowPing)
 
 	m.Timestamp = int32(time.Now().Unix())
 

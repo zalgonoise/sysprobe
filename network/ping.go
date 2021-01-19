@@ -2,15 +2,11 @@ package network
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"os/signal"
-	"strconv"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/ZalgoNoise/sysprobe/utils"
 	"github.com/go-ping/ping"
 )
 
@@ -33,32 +29,6 @@ type Alive struct {
 type Scan interface {
 	Burst(addr string) *PingScan
 	Paced(addr string) *PingScan
-}
-
-// ExpandCIDR method - expands (simple) CIDR addresses
-// currently supporting 0/24 addresses and above,
-// listing the number of addresses starting at
-// 255 and downwards.
-// Work needs to be done with this method in the future
-func (p *PingScan) ExpandCIDR(ip, cidr string) []string {
-	input, _ := strconv.Atoi(cidr)
-	exp := 32 - input
-
-	const base float64 = 2
-	calc := math.Pow(base, float64(exp))
-	output := int32(calc) - 2
-
-	ip = strings.TrimRight(ip, "0")
-
-	var res []string
-
-	for i := 255; i > 255-int(output); i-- {
-
-		curIP := ip + strconv.Itoa(i)
-		res = append(res, curIP)
-	}
-
-	return res
 }
 
 // New method - issues a new ping event to the provided
@@ -111,20 +81,12 @@ func (p *PingScan) New(wg *sync.WaitGroup, ct int, t time.Duration, h string) {
 // issue all ping requests concurrently
 // Go will automatically manage this sequence, which is
 // aimed for performance, not order
-func (p *PingScan) Burst(addr string) *PingScan {
+func (p *PingScan) Burst(addr []string) *PingScan {
 	var wg sync.WaitGroup
 
-	p.Target = addr
-
-	ip := utils.Splitter(addr, "/", 0)
-
-	cidr := utils.Splitter(addr, "/", 1)
-
-	ipList := p.ExpandCIDR(ip, cidr)
-
-	for _, e := range ipList {
+	for _, e := range addr {
 		wg.Add(1)
-		go p.New(&wg, 1, 30, e)
+		go p.New(&wg, 1, 10000, e)
 	}
 	wg.Wait()
 	return p
@@ -134,21 +96,13 @@ func (p *PingScan) Burst(addr string) *PingScan {
 // goroutines. This will result in a slower, one-by-one
 // ping execution, where the results will come back
 // indexed as sent
-func (p *PingScan) Paced(addr string) *PingScan {
+func (p *PingScan) Paced(addr []string) *PingScan {
 	var wg sync.WaitGroup
 
-	p.Target = addr
-
-	ip := utils.Splitter(addr, "/", 0)
-
-	cidr := utils.Splitter(addr, "/", 1)
-
-	ipList := p.ExpandCIDR(ip, cidr)
-
-	for _, e := range ipList {
+	for _, e := range addr {
+		fmt.Println("Scanned IPv4 " + e)
 		wg.Add(1)
-		fmt.Println("# Paced-ping: scanning " + e)
-		p.New(&wg, 1, 100, e)
+		p.New(&wg, 1, 10000, e)
 	}
 	wg.Wait()
 	return p
