@@ -1,6 +1,7 @@
 package network
 
 import (
+	"fmt"
 	"math"
 	"os"
 	"os/signal"
@@ -146,6 +147,7 @@ func (p *PingScan) Paced(addr string) *PingScan {
 
 	for _, e := range ipList {
 		wg.Add(1)
+		fmt.Println("# Paced-ping: scanning " + e)
 		p.New(&wg, 1, 100, e)
 	}
 	wg.Wait()

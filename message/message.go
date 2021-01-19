@@ -20,7 +20,7 @@ type Message struct {
 // New function - it builds a new Message struct,
 // containing the data in Internet, Battery, as well
 // as the current Unix timestamp
-func (m *Message) New(batRef, netRef, pingRef string) *Message {
+func (m *Message) New(batRef, netRef, pingRef string, slowPing bool) *Message {
 
 	b := &bat.Battery{}
 	s := &net.System{}
@@ -30,7 +30,12 @@ func (m *Message) New(batRef, netRef, pingRef string) *Message {
 	m.Battery = *b
 
 	s.Get(netRef)
-	p.Burst(pingRef)
+
+	if slowPing != true {
+		p.Burst(pingRef)
+	} else {
+		p.Paced(pingRef)
+	}
 
 	n := &net.Network{System: *s, Ping: *p}
 	m.Network = *n
