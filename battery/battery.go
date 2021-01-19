@@ -37,15 +37,15 @@ func (b *Battery) Get(batteryLoc string) *Battery {
 	line := 0
 
 	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), "STATUS") {
+		if strings.Contains(scanner.Text(), "STATUS=") {
 			val := utils.Splitter(scanner.Text(), "=", 1)
 			b.Status = val
 
-		} else if strings.Contains(scanner.Text(), "HEALTH") {
+		} else if strings.Contains(scanner.Text(), "HEALTH=") {
 			val := utils.Splitter(scanner.Text(), "=", 1)
 			b.Health = val
 
-		} else if strings.Contains(scanner.Text(), "CAPACITY") {
+		} else if strings.Contains(scanner.Text(), "CAPACITY=") {
 			val := utils.Splitter(scanner.Text(), "=", 1)
 			intVal, err := strconv.Atoi(val)
 			utils.Check(err)
@@ -58,7 +58,7 @@ func (b *Battery) Get(batteryLoc string) *Battery {
 			var floatVal float32 = (float32(intVal) / 10)
 			b.Temp.Internal = floatVal
 
-		} else if strings.Contains(scanner.Text(), "TEMP_AMBIENT") {
+		} else if strings.Contains(scanner.Text(), "TEMP_AMBIENT=") {
 			val := utils.Splitter(scanner.Text(), "=", 1)
 			intVal, err := strconv.Atoi(val)
 			utils.Check(err)
