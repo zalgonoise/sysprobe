@@ -6,16 +6,25 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ZalgoNoise/sysprobe/types"
 	"github.com/ZalgoNoise/sysprobe/utils"
 )
 
-// GetBattery function - collects battery related values
+// Battery type will be converted to JSON
+// containing important information for this module
+type Battery struct {
+	Status   string `json:"status"`
+	Health   string `json:"health"`
+	Capacity int    `json:"capacity"`
+	Temp     struct {
+		Internal float32 `json:"int"`
+		Ambient  float32 `json:"ext"`
+	} `json:"temp"`
+}
+
+// Get method - collects battery related values
 // from /sys/class/power_supply/*/uevent, and returns a
 // pointer to the Battery struct with this data
-func GetBattery(batteryLoc string) *types.Battery {
-
-	b := &types.Battery{}
+func (b *Battery) Get(batteryLoc string) *Battery {
 
 	batteryFile := "/sys/class/power_supply/" + batteryLoc + "/uevent"
 
