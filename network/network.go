@@ -11,26 +11,37 @@ import (
 // Network type will be converted to JSON
 // containing important information for this module
 type Network struct {
-	System System   `json:"sys"`
-	Ping   PingScan `json:"ping"`
+	System System      `json:"sys"`
+	Ping   PingScan    `json:"ping"`
+	Ports  ScanResults `json:"ports"`
 }
 
 // Build method - issues network-related microprocesses
 // which builds up to the Network struct
-func (n *Network) Build(netRef, pingRef string, slowPing bool) *Network {
+func (n *Network) Build(netRef, pingRef string, slowPing, portScanOpt bool) *Network {
 
-	s := &System{}
-	s.Get(netRef)
+	sys := &System{}
+	sys.Get(netRef)
 
-	p := &PingScan{}
-	ipList := p.ExpandCIDR(pingRef)
+	ping := &PingScan{}
+	ipList := ping.ExpandCIDR(pingRef)
+
 	if slowPing != true {
-		p.Burst(ipList)
+		ping.Burst(ipList)
 	} else {
-		p.Paced(ipList)
+		ping.Paced(ipList)
 	}
 
-	n = &Network{System: *s, Ping: *p}
+	if portScanOpt != false {
+		alive := ping.Get()
+
+		port := &ScanResults{}
+		port.Create(alive, 1024)
+		n = &Network{System: *sys, Ping: *ping, Ports: *port}
+
+	} else {
+		n = &Network{System: *sys, Ping: *ping}
+	}
 
 	return n
 }

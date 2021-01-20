@@ -31,6 +31,15 @@ type Scan interface {
 	Paced(addr string) *PingScan
 }
 
+func (p *PingScan) Get() []string {
+	var allHosts []string
+
+	for _, v := range p.Alive {
+		allHosts = append(allHosts, v.Address)
+	}
+	return allHosts
+}
+
 // New method - issues a new ping event to the provided
 // address, while building the PingScan.Alive struct with
 // its results
