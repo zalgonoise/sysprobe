@@ -60,7 +60,7 @@ ______
        valid_lft forever preferred_lft forever
 ```
 
-  - Ping *.*.*.0/24 networks and list responding hosts
+  - Ping \*.\*.\*.0/24 networks and list responding hosts
 
   - Port scan the alive hosts from the ping scan
 
@@ -126,8 +126,17 @@ mmcblk0p26        0.00         0.00         0.00          0        192
 mmcblk0p28        0.84         0.01         0.01      29353      64840
 
 ```
+    
+  - System uptime and average load
 
-  - Processes metadata
+    - `uptime`
+
+```
+20:37:17 up 56 days, 23:40,  load average: 5.15, 5.20, 5.70
+```
+
+
+  - Processes metadata (*nix and app-specific)
 
     - `tsudo ps -aux | wc -l` (returns a number (_int_))
 
