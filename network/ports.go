@@ -37,7 +37,8 @@ type PortScan struct {
 func (p *PortScan) Scan(proto, addr string, port int) *PortScan {
 
 	address := addr + ":" + strconv.Itoa(port)
-	conn, err := net.DialTimeout(proto, address, 4*time.Second)
+	var timeout time.Duration = 100000000
+	conn, err := net.DialTimeout(proto, address, timeout)
 
 	if err != nil {
 		p.Status = "Closed"
