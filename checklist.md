@@ -3,6 +3,51 @@
 _Development checklist and notes_
 ______
 
+## Response message JSON schema
+
+```json
+
+{
+  "net": {
+    "sys": {
+      "device": "string",
+      "id": 0,
+      "ipv4": "string",
+      "mask": "string"
+    },
+    "ping": {
+      "target": "string",
+      "alive": [
+        {
+          "addr": "string",
+          "rtt": 0
+        }
+      ]
+    },
+    "ports": [
+      {
+        "target": "string",
+        "proto": "string",
+        "ports": [
+          0
+        ]
+      }
+    ]
+  },
+  "power": {
+    "status": "string",
+    "health": "string",
+    "capacity": 0,
+    "temp": {
+      "int": 0,
+      "ext": 0
+    }
+  },
+  "timestamp": 0
+}
+```
+
+
 ## Features
 
 - Network metadata 
