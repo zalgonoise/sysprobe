@@ -4,6 +4,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/ZalgoNoise/sysprobe/utils"
 )
@@ -11,33 +12,62 @@ import (
 // Network type will be converted to JSON
 // containing important information for this module
 type Network struct {
-	System System      `json:"sys"`
-	Ping   PingScan    `json:"ping"`
-	Ports  ScanResults `json:"ports"`
+	System System     `json:"sys"`
+	Ping   PingScan   `json:"ping"`
+	Ports  []HostScan `json:"ports"`
 }
 
 // Build method - issues network-related microprocesses
 // which builds up to the Network struct
 func (n *Network) Build(netRef, pingRef string, slowPing, portScanOpt bool) *Network {
-
-	sys := &System{}
-	sys.Get(netRef)
+	var wg sync.WaitGroup
 
 	ping := &PingScan{}
+	sys := &System{}
+	port := &ScanResults{}
 	ipList := ping.ExpandCIDR(pingRef)
 
 	if slowPing != true {
-		ping.Burst(ipList)
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			ping.Burst(ipList)
+
+		}(&wg)
+
 	} else {
-		ping.Paced(ipList)
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			ping.Paced(ipList)
+
+		}(&wg)
+
 	}
+	wg.Wait()
 
 	if portScanOpt != false {
-		alive := ping.Get()
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
 
-		port := &ScanResults{}
-		port.Create(alive, 1024)
-		n = &Network{System: *sys, Ping: *ping, Ports: *port}
+			alive := ping.Get()
+
+			port.Create(alive, 1024)
+		}(&wg)
+	}
+
+	wg.Add(1)
+	go func(wg *sync.WaitGroup) {
+		defer wg.Done()
+		sys.Get(netRef)
+
+	}(&wg)
+
+	wg.Wait()
+
+	if portScanOpt != false {
+		n = &Network{System: *sys, Ping: *ping, Ports: port.Results}
 
 	} else {
 		n = &Network{System: *sys, Ping: *ping}
