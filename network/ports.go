@@ -9,16 +9,16 @@ import (
 // ScanResults struct will hold a list of HostScans.
 // This is the placeholder for all host queries
 type ScanResults struct {
-	Results []HostScan
+	Results []HostScan `json:"results"`
 }
 
 // HostScan struct will contain the probe results for
 // a single host. It will hold the target IP address,
 // the protocol used, and the open ports in a slice of ints.
 type HostScan struct {
-	Target   string
-	Protocol string
-	Ports    []int
+	Target   string `json:"target"`
+	Protocol string `json:"proto"`
+	Ports    []int  `json:"ports"`
 }
 
 // PortScan struct will contain the results for a single
@@ -26,8 +26,8 @@ type HostScan struct {
 // while the Open key will contain a boolean for open / closed
 // status
 type PortScan struct {
-	Port   int
-	Status string
+	Port   int    `json:"port"`
+	Status string `json:"status"`
 }
 
 // Scan method will dial in for the referred {host}:{port} with
