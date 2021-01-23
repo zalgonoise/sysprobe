@@ -20,6 +20,7 @@ type Battery struct {
 		Internal float32 `json:"int"`
 		Ambient  float32 `json:"ext"`
 	} `json:"temp"`
+	Source string `json:"source"`
 }
 
 // TermuxBattery struct serves as a fallback object in case the uevent
@@ -35,31 +36,29 @@ type TermuxBattery struct {
 	Current  int     `json:"current"`
 }
 
-// Get method for TermuxBattery objects will execute the
+// TermuxGet method for Battery objects will execute the
 // `termux-battery-status` command, and retrieve the slice of bytes
 // which are already a JSON object. The method will unmarshal the JSON
-// object into a TermuxBattery object
-func (tb *TermuxBattery) Get() (*TermuxBattery, bool) {
-
+// object into a TermuxBattery object and its values pushed back to
+// Battery
+func (b *Battery) TermuxGet() *Battery {
+	tb := &TermuxBattery{}
 	exec, err := utils.Run("termux-battery-status")
 
 	if err != nil {
-		json.Unmarshal(exec, tb)
-		return tb, true
-	} else {
-		return tb, false
+		b.Source = "Failed to probe battery health"
+		return b
 	}
-}
 
-// Push method for TermuxBattery will inject the values from the
-// TermuxBattery object into the Battery (message) object
-func (tb *TermuxBattery) Push(b *Battery) *Battery {
+	json.Unmarshal(exec, tb)
 	b.Capacity = tb.Capacity
 	b.Health = tb.Health
 	b.Status = tb.Status
 	b.Temp.Internal = tb.Temp
+	b.Source = "/data/data/com.termux/files/usr/bin/termux-battery-status"
 
 	return b
+
 }
 
 // Get method - collects battery related values
@@ -71,17 +70,13 @@ func (b *Battery) Get(batteryLoc string) *Battery {
 
 	bat, err := os.Open(batteryFile)
 	if err != nil {
-		tb := &TermuxBattery{}
-		tb, success := tb.Get()
-
-		if success != true {
-			return b
-		}
-
-		tb.Push(b)
+		bat.Close()
+		b.TermuxGet()
 		return b
 	}
 	defer bat.Close()
+
+	b.Source = batteryFile
 
 	scanner := bufio.NewScanner(bat)
 

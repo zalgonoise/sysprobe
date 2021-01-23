@@ -29,7 +29,9 @@ func Splitter(s, d string, i int) (val string) {
 func Run(args ...string) ([]byte, error) {
 
 	cmdPath, err := exec.LookPath(args[0])
-	Check(err)
+	if err != nil {
+		return nil, err
+	}
 
 	cmdFlags := args[1:]
 

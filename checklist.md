@@ -41,7 +41,8 @@ ______
     "temp": {
       "int": 0,
       "ext": 0
-    }
+    },
+    "source": "string"
   },
   "timestamp": 0
 }
@@ -88,6 +89,13 @@ POWER_SUPPLY_TEMP=310
 POWER_SUPPLY_TEMP_AMBIENT=288
 POWER_SUPPLY_CHARGE_CONTROL_LIMIT=0
 ```
+
+    - Termux fallback (if there is no root access):
+
+      - `termux-battery-status`
+
+
+## To do
 
   - RAM metadata
 
