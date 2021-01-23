@@ -90,9 +90,9 @@ POWER_SUPPLY_TEMP_AMBIENT=288
 POWER_SUPPLY_CHARGE_CONTROL_LIMIT=0
 ```
 
-    - Termux fallback (if there is no root access):
-
-      - `termux-battery-status`
+  - Termux fallback (if there is no root access):
+  
+    - `termux-battery-status`
 
 
 ## To do
