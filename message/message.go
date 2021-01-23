@@ -1,3 +1,14 @@
+// Package message is a module to handle this binary's request and response
+// messages, and the output's JSON encoding (possibly just for debugging or
+// testing, considering the implementation of rpc between client/server).
+//
+// The Request struct will contain the instructions to run the probes,
+// while the Response will retrieve and join all module's provided data.
+//
+// The command-line arguments are also being handled in this package, with
+// the Request.New() method, which defines both default and user-defined
+// parameters.
+//
 package message
 
 import (

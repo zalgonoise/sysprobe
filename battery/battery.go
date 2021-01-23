@@ -1,3 +1,32 @@
+// Package battery is a module to collect battery health information
+// about your *nix device. Originally intended to collect battery metadata
+// from Android smartphones, namely with root access to read the
+// /sys/class/power_supply/battery/uevent file, however it is also ready
+// to collect the same information without root access, referring to the
+// termux-battery-status binary.
+//
+// On a Linux laptop, you can also read the battery information, although
+// it would be recommended to change the pattern matching section in the
+// Battery.Get() method.
+//
+// To run this module locally, you can try the following pattern by pointing
+// to your local /sys/class/power_supply/* folder, as seen in message.go:
+//
+//	import (
+//		"encoding/json"
+//		"fmt"
+//		bat "github.com/ZalgoNoise/sysprobe/battery"
+//	)
+//
+//	func main() {
+//		b := &bat.Battery{}
+//		b = b.Get("battery") 	// points to /sys/class/power_supply/battery/uevent
+//								// falls back to termux-battery-status if inaccessible
+//		json, err := json.Marshal(b)
+//		if err != nil {
+//		fmt.Println(string(json))
+//	}
+//
 package battery
 
 import (
