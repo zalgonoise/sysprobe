@@ -3,8 +3,11 @@ package network
 import (
 	"net"
 	"strconv"
+	"sync"
 	"time"
 )
+
+var wg sync.WaitGroup
 
 // ScanResults struct will hold a list of HostScans.
 // This is the placeholder for all host queries
@@ -55,7 +58,7 @@ func (p *PortScan) Scan(proto, addr string, port int) *PortScan {
 // events, and register only the open ports in the HostScan.Ports[]
 // slice of ints
 func (p *PortScan) New(h *HostScan, port int) *PortScan {
-
+	defer wg.Done()
 	p.Scan(h.Protocol, h.Target, port)
 
 	if p.Status != "Closed" {
@@ -71,12 +74,14 @@ func (p *PortScan) New(h *HostScan, port int) *PortScan {
 // a quick scan would probe 1024 ports while a wide scan would
 // target 49152 ports
 func (h *HostScan) New(scanScope int) *HostScan {
+	wg.Add(scanScope)
 
 	for i := 1; i <= scanScope; i++ {
 
 		scan := &PortScan{Port: i}
-		scan.New(h, i)
+		go scan.New(h, i)
 	}
+	wg.Wait()
 
 	return h
 
@@ -85,8 +90,8 @@ func (h *HostScan) New(scanScope int) *HostScan {
 // Create method will initialize a set of HostScan.New() events,
 // based on the provided hosts, which are being fed as a slice of
 // strings.
-func (s *ScanResults) Create(hosts []string, scanScope int) *ScanResults {
-	//var wg sync.WaitGroup
+func (s *ScanResults) Create(mwg *sync.WaitGroup, hosts []string, scanScope int) *ScanResults {
+	defer mwg.Done()
 
 	for _, e := range hosts {
 		//	wg.Add(1)

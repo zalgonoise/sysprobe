@@ -2,6 +2,7 @@ package network
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/ZalgoNoise/sysprobe/utils"
 )
@@ -17,8 +18,9 @@ type System struct {
 // Get method - runs a simple `ip` command to retrieve the
 // current information from the active network device, which
 // returns a pointer to the Internet struct with this data
-func (s *System) Get(ipDevice string) *System {
+func (s *System) Get(wg *sync.WaitGroup, ipDevice string) *System {
 
+	defer wg.Done()
 	ip, err := utils.Run("ip", "-f", "inet", "addr", "show", ipDevice)
 	utils.Check(err)
 

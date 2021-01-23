@@ -9,11 +9,12 @@ import (
 func main() {
 
 	request := &msg.Request{}
-	request.Create()
+	response := &msg.Response{}
 
-	m := &msg.Response{}
-	m = m.New(*request)
+	request.New()
 
-	fmt.Println(string(m.JSON()))
+	response = response.New(*request)
+
+	fmt.Println(string(response.JSON()))
 
 }

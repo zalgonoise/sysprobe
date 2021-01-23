@@ -90,7 +90,8 @@ func (p *PingScan) New(wg *sync.WaitGroup, ct int, t time.Duration, h string) {
 // issue all ping requests concurrently
 // Go will automatically manage this sequence, which is
 // aimed for performance, not order
-func (p *PingScan) Burst(addr []string) *PingScan {
+func (p *PingScan) Burst(mwg *sync.WaitGroup, addr []string) *PingScan {
+	defer mwg.Done()
 	var wg sync.WaitGroup
 
 	for _, e := range addr {
@@ -105,7 +106,8 @@ func (p *PingScan) Burst(addr []string) *PingScan {
 // goroutines. This will result in a slower, one-by-one
 // ping execution, where the results will come back
 // indexed as sent
-func (p *PingScan) Paced(addr []string) *PingScan {
+func (p *PingScan) Paced(mwg *sync.WaitGroup, addr []string) *PingScan {
+	defer mwg.Done()
 	var wg sync.WaitGroup
 
 	for _, e := range addr {

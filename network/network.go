@@ -29,41 +29,21 @@ func (n *Network) Build(netRef, pingRef string, slowPing, portScanOpt bool) *Net
 
 	if slowPing != true {
 		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-			ping.Burst(ipList)
-
-		}(&wg)
-
+		go ping.Burst(&wg, ipList)
 	} else {
 		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-			ping.Paced(ipList)
-
-		}(&wg)
-
+		go ping.Paced(&wg, ipList)
 	}
 	wg.Wait()
 
 	if portScanOpt != false {
+		alive := ping.Get()
 		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-
-			alive := ping.Get()
-
-			port.Create(alive, 1024)
-		}(&wg)
+		go port.Create(&wg, alive, 1024)
 	}
 
 	wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		sys.Get(netRef)
-
-	}(&wg)
-
+	go sys.Get(&wg, netRef)
 	wg.Wait()
 
 	if portScanOpt != false {

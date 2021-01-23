@@ -13,11 +13,13 @@ import (
 // Request struct will contain the flags necessary to
 // execute the needed jobs and to return a Message object
 type Request struct {
+	BatteryOpt  bool
+	PingOpt     bool
+	PortScanOpt bool
 	BatteryPath string
 	IPDevice    string
 	PingAddr    string
 	SlowPing    bool
-	PortScanOpt bool
 }
 
 // Response struct will contain all structs
@@ -31,20 +33,26 @@ type Response struct {
 // Create method will gather the input flags and build the
 // instructions for the request. Serves as a handler for
 // default values as well
-func (r *Request) Create() *Request {
+func (r *Request) New() *Request {
+	// Triggers and toggles
+	batteryOpt := flag.Bool("b", false, "Option to run a battery scan")
+	pingOpt := flag.Bool("p", false, "Option to run a ping scan. Can take in the parameters -net and -slow.")
+	portScanOpt := flag.Bool("P", false, "perform a port scan on the alive IP addresses")
+
 	batteryPath := flag.String("bat", "battery", "the default location for the battery uevent file, in /sys/class/power_supply/")
 	ipDevice := flag.String("net", "wlan0", "the default network device to retrieve IP-related information, with the `ip` command")
 	pingAddr := flag.String("ping", "192.168.0.0/24", "the network or subnet address to issue ping events, similar to the *nix `ping` command (but in Go)")
 	slowPing := flag.Bool("slow", false, "skip goroutines - perform single-threaded actions only")
-	portScanOpt := flag.Bool("port", false, "perform a port scan on the alive IP addresses")
 
 	flag.Parse()
 
+	r.BatteryOpt = *batteryOpt
+	r.PingOpt = *pingOpt
+	r.PortScanOpt = *portScanOpt
 	r.BatteryPath = *batteryPath
 	r.IPDevice = *ipDevice
 	r.PingAddr = *pingAddr
 	r.SlowPing = *slowPing
-	r.PortScanOpt = *portScanOpt
 
 	return r
 }
@@ -56,10 +64,18 @@ func (r *Request) Create() *Request {
 func (m *Response) New(r Request) *Response {
 
 	b := &bat.Battery{}
-	b = b.Get(r.BatteryPath)
+
+	if r.BatteryOpt != false {
+		b = b.Get(r.BatteryPath)
+	}
+
 	m.Battery = *b
 
-	m.Network = *m.Network.Build(r.IPDevice, r.PingAddr, r.SlowPing, r.PortScanOpt)
+	if r.PingOpt != true {
+		m.Network = net.Network{}
+	} else {
+		m.Network = *m.Network.Build(r.IPDevice, r.PingAddr, r.SlowPing, r.PortScanOpt)
+	}
 
 	m.Timestamp = int32(time.Now().Unix())
 
