@@ -1,3 +1,16 @@
+// Package network is the main module to handle all network-related
+// metadata collection actions.
+//
+// It is capable of running each module individually (except port scan,
+// which requires a ping scan), where the absense of data will simply
+// return an empty object corresponding to that module (PingScan, HostScan,
+// or the whole net object).
+//
+// Its main focus is the Network.Build() method, responsible for queueing
+// and orchestrating all the network-related tasks, but it also contains the
+// PingScan.ExpandCIDR() method, which is responsible for breaking down
+// subnets into slices of strings, for the respective hosts in it.
+//
 package network
 
 import (

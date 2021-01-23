@@ -1,3 +1,7 @@
+// Package utils is mostly focused in summarizing recurrent functions
+// in this binary (and possibly other ones), to avoid repetition in
+// different packages
+//
 package utils
 
 import (
