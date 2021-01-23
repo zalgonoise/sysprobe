@@ -1,7 +1,8 @@
 // Sysprobe is a simple, fast and modular binary to collect metadata
-// from your devices (I am talking to you, old rooted smartphone from 2016
-// which I no longer use but refuse to throw away) and push it to a NoSQL
-// database in your network (for metrics, alerts, etc)
+// from your devices and push it to a NoSQL database in your network
+//
+// == I am talking to you, old rooted smartphone from 2016
+// which I no longer use but refuse to throw away ==
 //
 // The point of the project is to have a one-binary-for-all when it comes to
 // collecting heartbeats from devices, regardless of the complexity or the
