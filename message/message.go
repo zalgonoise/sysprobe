@@ -60,7 +60,7 @@ func (r *Request) New() *Request {
 	return r
 }
 
-// New method - it builds a new Message struct,
+// New method - it builds a new Response struct,
 // containing the data in Internet, Battery, as well
 // as the current Unix timestamp
 //func (m *Response) New(batRef, netRef, pingRef string, slowPing, portScanOpt bool) *Message {
@@ -85,7 +85,7 @@ func (m *Response) New(r Request) *Response {
 	return m
 }
 
-// JSON method - converts the Message struct into
+// JSON method - converts the Response struct into
 // a JSON-encoded byte array
 func (m *Response) JSON() []byte {
 	json, err := json.Marshal(m)
