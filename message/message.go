@@ -31,7 +31,7 @@ type Response struct {
 	Timestamp int32       `json:"timestamp"`
 }
 
-// Create method will gather the input flags and build the
+// New method will gather the input flags and build the
 // instructions for the request. Serves as a handler for
 // default values as well
 func (r *Request) New() *Request {
@@ -60,7 +60,7 @@ func (r *Request) New() *Request {
 	return r
 }
 
-// New function - it builds a new Message struct,
+// New method - it builds a new Message struct,
 // containing the data in Internet, Battery, as well
 // as the current Unix timestamp
 //func (m *Response) New(batRef, netRef, pingRef string, slowPing, portScanOpt bool) *Message {
