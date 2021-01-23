@@ -40,7 +40,7 @@ type PortScan struct {
 func (p *PortScan) Scan(proto, addr string, port int) *PortScan {
 
 	address := addr + ":" + strconv.Itoa(port)
-	var timeout time.Duration = 100000000
+	var timeout time.Duration = time.Millisecond * 500
 	conn, err := net.DialTimeout(proto, address, timeout)
 
 	if err != nil {
@@ -73,7 +73,8 @@ func (p *PortScan) New(h *HostScan, port int) *PortScan {
 // events for the range defined in the scanScope parameter
 // a quick scan would probe 1024 ports while a wide scan would
 // target 49152 ports
-func (h *HostScan) New(scanScope int) *HostScan {
+func (h *HostScan) New(s *ScanResults, scanScope int) *HostScan {
+
 	wg.Add(scanScope)
 
 	for i := 1; i <= scanScope; i++ {
@@ -82,6 +83,10 @@ func (h *HostScan) New(scanScope int) *HostScan {
 		go scan.New(h, i)
 	}
 	wg.Wait()
+
+	if h.Ports != nil {
+		s.Results = append(s.Results, *h)
+	}
 
 	return h
 
@@ -94,18 +99,10 @@ func (s *ScanResults) Create(mwg *sync.WaitGroup, hosts []string, scanScope int)
 	defer mwg.Done()
 
 	for _, e := range hosts {
-		//	wg.Add(1)
-		//	go func(wg *sync.WaitGroup) {
-		//		defer wg.Done()
 
 		scan := &HostScan{Target: e, Protocol: "tcp"}
-		scan.New(scanScope)
+		scan.New(s, scanScope)
 
-		if scan.Ports != nil {
-			s.Results = append(s.Results, *scan)
-		}
-		//	}(&wg)
-		//	wg.Wait()
 	}
 
 	return s

@@ -77,11 +77,8 @@ func (p *PingScan) New(wg *sync.WaitGroup, ct int, t time.Duration, h string) {
 		a := Alive{Address: pkt.IPAddr.String(), Time: pkt.Rtt}
 
 		p.Alive = append(p.Alive, a)
-
-		//fmt.Printf("%s: OK!\t%v\n", pkt.IPAddr, pkt.Rtt)
 	}
 
-	//fmt.Printf("PING %s (%s):\n", pinger.Addr(), pinger.IPAddr())
 	err = pinger.Run()
 	if err != nil {
 		panic(err)

@@ -1,9 +1,7 @@
 package network
 
 import (
-	"math"
-	"strconv"
-	"strings"
+	"net"
 	"sync"
 
 	"github.com/ZalgoNoise/sysprobe/utils"
@@ -25,7 +23,9 @@ func (n *Network) Build(netRef, pingRef string, slowPing, portScanOpt bool) *Net
 	ping := &PingScan{}
 	sys := &System{}
 	port := &ScanResults{}
-	ipList := ping.ExpandCIDR(pingRef)
+
+	ipList, err := ping.ExpandCIDR(pingRef)
+	utils.Check(err)
 
 	if slowPing != true {
 		wg.Add(1)
@@ -39,7 +39,10 @@ func (n *Network) Build(netRef, pingRef string, slowPing, portScanOpt bool) *Net
 	if portScanOpt != false {
 		alive := ping.Get()
 		wg.Add(1)
-		go port.Create(&wg, alive, 1024)
+
+		go port.Create(&wg, alive, 9999)
+		//go port.Create(&wg, alive, 1024)
+		//go port.Create(&wg, alive, 49152)
 	}
 
 	wg.Add(1)
@@ -57,33 +60,43 @@ func (n *Network) Build(netRef, pingRef string, slowPing, portScanOpt bool) *Net
 }
 
 // ExpandCIDR method - expands (simple) CIDR addresses
-// currently supporting 0/24 addresses and above,
-// listing the number of addresses starting at
-// 255 and downwards.
-// Work needs to be done with this method in the future
-func (p *PingScan) ExpandCIDR(target string) []string {
+// taking the example from https://gist.github.com/kotakanbe/d3059af990252ba89a82
+// Fixed issue with /32 CIDR addresses
+func (p *PingScan) ExpandCIDR(target string) ([]string, error) {
+	// set target from the object's Target key
 	p.Target = target
 
-	ip := utils.Splitter(p.Target, "/", 0)
-
-	cidr := utils.Splitter(p.Target, "/", 1)
-
-	input, _ := strconv.Atoi(cidr)
-	exp := 32 - input
-
-	const base float64 = 2
-	calc := math.Pow(base, float64(exp))
-	output := int32(calc) - 2
-
-	ip = strings.TrimRight(ip, "0")
-
-	var res []string
-
-	for i := 255; i > 255-int(output); i-- {
-
-		curIP := ip + strconv.Itoa(i)
-		res = append(res, curIP)
+	// parse the CIDR in the input address
+	ip, ipnet, err := net.ParseCIDR(target)
+	if err != nil {
+		return nil, err
 	}
 
-	return res
+	var ips []string
+
+	// iterate through the network mask, confirming if the input IP is present
+	// in the network, and incrementing the IP address by 1. If all checks
+	// evaluate to true, then add the IP address to the slice of strings
+	for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); addrIncrement(ip) {
+		ips = append(ips, ip.String())
+	}
+	// remove network address (e.g. 192.168.0.0)
+	// removing the broadcast address only if the slice contains 3 or more elements
+	// this will correctly evaluate the addresses for /30, /31 and /32 CIDRs:
+	// [192.168.0.1 192.168.0.2], [192.168.0.1] and [], respectively
+	if len(ips) <= 3 {
+		return ips[1:], nil
+	} else {
+		return ips[1 : len(ips)-1], nil
+	}
+
+}
+
+func addrIncrement(ip net.IP) {
+	for j := len(ip) - 1; j >= 0; j-- {
+		ip[j]++
+		if ip[j] > 0 {
+			break
+		}
+	}
 }
