@@ -31,6 +31,9 @@ type Scan interface {
 	Paced(addr string) *PingScan
 }
 
+// Get method will return the slice of addresses (strings) for all
+// alive hosts. This is being used on the port scan routines, to skip
+// running through all addresses again
 func (p *PingScan) Get() []string {
 	var allHosts []string
 
