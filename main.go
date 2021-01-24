@@ -16,26 +16,14 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 
-	msg "github.com/ZalgoNoise/sysprobe/message"
+	"github.com/ZalgoNoise/sysprobe/probe"
 )
 
 func main() {
+	probe := probe.New()
+	probe.Run()
 
-	request := &msg.Request{}
-
-	if request.HelpOpt != false {
-		flag.Usage()
-	} else {
-
-		response := &msg.Response{}
-
-		request.New()
-
-		response = response.New(*request)
-
-		fmt.Println(string(response.JSON()))
-	}
+	fmt.Println(string(probe.JSON))
 }

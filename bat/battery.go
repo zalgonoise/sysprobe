@@ -1,4 +1,4 @@
-// Package battery is a module to collect battery health information
+// Package bat is a module to collect battery health information
 // about your *nix device. Originally intended to collect battery metadata
 // from Android smartphones, namely with root access to read the
 // /sys/class/power_supply/battery/uevent file, however it is also ready
@@ -15,7 +15,7 @@
 //	import (
 //		"encoding/json"
 //		"fmt"
-//		bat "github.com/ZalgoNoise/sysprobe/battery"
+//		"github.com/ZalgoNoise/sysprobe/bat"
 //	)
 //
 //	func main() {
@@ -27,7 +27,7 @@
 //		fmt.Println(string(json))
 //	}
 //
-package battery
+package bat
 
 import (
 	"bufio"

@@ -1,4 +1,4 @@
-// Package network is the main module to handle all network-related
+// Package net is the main module to handle all network-related
 // metadata collection actions.
 //
 // It is capable of running each module individually (except port scan,
@@ -11,7 +11,7 @@
 // PingScan.ExpandCIDR() method, which is responsible for breaking down
 // subnets into slices of strings, for the respective hosts in it.
 //
-package network
+package net
 
 import (
 	"net"
