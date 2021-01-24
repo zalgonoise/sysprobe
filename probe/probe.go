@@ -1,13 +1,6 @@
-// Package message is a module to handle this binary's request and response
+// Package probe is a module to handle this binary's request and response
 // messages, and the output's JSON encoding (possibly just for debugging or
 // testing, considering the implementation of rpc between client/server).
-//
-// The Request struct will contain the instructions to run the probes,
-// while the Response will retrieve and join all module's provided data.
-//
-// The command-line arguments are also being handled in this package, with
-// the Request.New() method, which defines both default and user-defined
-// parameters.
 //
 package probe
 
@@ -21,48 +14,81 @@ import (
 	"github.com/ZalgoNoise/sysprobe/net"
 )
 
-// Message struct will contain the whole process of execution,
-// in one object
+// Prober struct will contain the whole process of execution,
+// in one object.
 type Prober struct {
-	Toggles     Toggles `json:"mods_enabled"`
-	Net         Net
-	BatteryPath string
-	Help        bool
-	Exec        Exec
-	Debug       bool
-	Response    Response
-	JSON        []byte
+
+	// Toggles will contain boolean values for the enabled
+	// modules in the pinger. These are read and their respective
+	// processes are executed as per this configuration
+	Toggles Toggles `json:"mods_enabled"`
+
+	// Net will contain network-related modules and settings,
+	// similar to Toggles, but isn't limited to boolean values.
+	// The address to your ping queries is defined here.
+	Net Net `json:"net_mods"`
+
+	// BatteryPath is the folder in /sys/class/power_supply/,
+	// where the uevent file is located
+	BatteryPath string `json:"battery_path"`
+
+	// Help will set to true or false whether the -help flag is
+	// passed
+	Help bool `json:"help_option"`
+
+	// Exec will contain a set of customizable functions which
+	// can be defined upon different implementations. These are
+	// not producing any output by default until defined.
+	Exec Exec `json:"execute"`
+
+	// Debug will set to true or false whether the -debug flag is
+	// passed.
+	Debug bool `json:"debug"`
+
+	// Response will contain the object with the results from the
+	// probe scan
+	Response Response `json:"response"`
+
+	// JSON will contain an array of bytes after Response is
+	// converted to JSON
+	JSON []byte `json:"json_output"`
 }
 
-// Request struct will contain the flags necessary to
-// execute the needed jobs and to return a Message object
-
-// Response struct will contain all structs
-// and a timestamp for when the messsage was sent
+// Response struct will contain all produced objects
+// and a timestamp for when the object was created
 type Response struct {
 	Network   net.Network `json:"net"`
 	Battery   bat.Battery `json:"power"`
 	Timestamp int32       `json:"timestamp"`
 }
 
+// Toggles struct is a simple object containing boolean values
+// for the modules activated upon runtime, as per flags enabled.
+// Services are either executed or not depending on how these are set
 type Toggles struct {
 	BatteryOpt  bool `json:"battery"`
 	PingOpt     bool `json:"ping"`
 	PortScanOpt bool `json:"ports"`
 }
 
+// Net struct will contain options and parameters to be used on
+// network-related operations
 type Net struct {
-	IPDevice string
-	PingAddr string
-	SlowPing bool
+	IPDevice string `json:"network_device"`
+	PingAddr string `json:"target_address"`
+	SlowPing bool   `json:"slow_ping"`
 }
 
+// Exec struct will hold OnStart(), OnRun() and OnDone() functions
+// which can be defined by the user. This can be be used to collect
+// different metadata as the tool expands
 type Exec struct {
 	OnStart func(*Toggles)
 	OnRun   func(*Response)
 	OnDone  func(*Prober)
 }
 
+// OnStart(), OnRun() and OnDone() placeholder functions
 func (p *Prober) onStart() {
 	hook := p.Exec.OnStart
 
@@ -87,6 +113,7 @@ func (p *Prober) onDone() {
 	}
 }
 
+// New function will generate and return a new Prober
 func New() *Prober {
 	p := build()
 	defer p.onStart()
