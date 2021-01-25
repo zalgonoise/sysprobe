@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "net",
+    srcs = [
+        "network.go",
+        "ping.go",
+        "ports.go",
+        "system.go",
+    ],
+    importpath = "github.com/ZalgoNoise/sysprobe/net",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//utils",
+        "@com_github_go_ping_ping//:ping",
+    ],
+)

@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "bat",
+    srcs = ["battery.go"],
+    importpath = "github.com/ZalgoNoise/sysprobe/bat",
+    visibility = ["//visibility:public"],
+    deps = ["//utils"],
+)
