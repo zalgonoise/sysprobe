@@ -13,3 +13,35 @@ go_binary(
     embed = [":sysprobe_lib"],
     visibility = ["//visibility:public"],
 )
+
+platform(
+    name = "x64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform(
+    name = "x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86",
+    ],
+)
+
+platform(
+    name = "arm64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm64",
+    ],
+)
+
+platform(
+    name = "arm",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:arm",
+    ],
+)
